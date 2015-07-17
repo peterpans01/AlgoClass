@@ -7,6 +7,7 @@ public class Percolation {
    private int size;
    private int bot;
    private int top;
+   public int blocked;
    public Percolation(int N)               // create N-by-N grid, with all sites blocked
      {
        if(N>0)
@@ -16,6 +17,7 @@ public class Percolation {
          qf = new QuickFindUF(N*N + 2);
          bot = size*size;
          top = size*size + 1;
+         blocked = size*size;
        }
        else
        {
@@ -31,6 +33,7 @@ public class Percolation {
           if (!grid[i-1][j-1])
           {
                grid[i-1][j-1] = true;
+               blocked--;
                if(i == 1)
                {
                   qf.union( (i-1)*size + j-1, top);
