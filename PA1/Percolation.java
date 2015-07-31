@@ -1,65 +1,111 @@
-//import QuickFindUF;
-//import In;
-
 public class Percolation {
-   private boolean[][] grid;
-   private QuickFindUF qf;
+   private byte[] grid;
+   private WeightedQuickUnionUF qf;
    private int size;
-   private int bot;
-   private int top;
-   public int blocked;
-   public Percolation(int N)               // create N-by-N grid, with all sites blocked
+   private boolean percolate;
+   //private byte max;
+   public Percolation(int N)     // create N-by-N grid, with all sites blocked
      {
-       if(N>0)
-       {
+       if (N > 0)
+       { 
          size = N;
-         grid = new boolean[N][N]; //open = true; close = false
-         qf = new QuickFindUF(N*N + 2);
-         bot = size*size;
-         top = size*size + 1;
-         blocked = size*size;
+         grid = new byte[N*N]; 
+         qf = new WeightedQuickUnionUF(N*N);
+         //max = 0;
+         percolate = false;
        }
        else
        {
          throw new java.lang.IllegalArgumentException();
        }
      }
-   public void open(int i, int j)          // open site (row i, column j) if it is not open already
+public void open(int i, int j)//open site (row i, column j) if it is not open already
      {
-       if(i>0 && i<size+1 && j>0 && j<size+1)
+       if (i > 0 && i < size+1 && j > 0 && j < size+1)
        {
-          //System.out.println("Go inside");
-          //set this as open
-          if (!grid[i-1][j-1])
+          if (grid[(i-1)*size + j-1] == 0)
           {
-               grid[i-1][j-1] = true;
-               blocked--;
-               if(i == 1)
+               int m = 1;
+               grid[(i-1)*size + j-1] = 1;
+               if (i == 1)
                {
-                  qf.union( (i-1)*size + j-1, top);
-               }
-               if(i == size)
-               {
-                  qf.union( (i-1)*size + j-1, bot);
+                  grid[(i-1)*size + j-1] = 3;
+                  m = m*3;
                }
                
-               //connect it
-               if(j < size && isOpen(i,j+1))
+               if (i == size)
                {
-                   qf.union( (i-1)*size + j-1, (i-1)*size + j );
+                   if (grid[(i-1)*size + j-1] < 2)
+                   {
+                      grid[(i-1)*size + j-1] = 2;
+                   }
+                   m = m*2;
                }
-               if(j > 1 && isOpen(i,j-1))
+               byte maxStatus = grid[(i-1)*size + j-1];
+               m = m * maxStatus;
+               if (j < size && isOpen(i , j+1))
                {
-                    qf.union( (i-1)*size + j-1, (i-1)*size + j-2 );
+                   int id = qf.find((i-1)*size + j);
+                   if (maxStatus < grid[id])
+                   {
+                       maxStatus = grid[id];
+                   }
+                   m = m * grid[id];
+                   qf.union((i-1)*size + j-1, (i-1)*size + j);
                }
-               if(i < size && isOpen(i+1,j))
+               if (j > 1 && isOpen(i, j-1))
                {
-                   qf.union( (i-1)*size + j-1, i*size + j-1 );
+//                   if ( topConnectedness[i-1][j-2]) 
+//                   {
+//                       topConnectedness[i-1][j-1] = true;
+//                   }
+                   int id = qf.find((i-1)*size + j-2);
+                    if (maxStatus < grid[id])
+                   {
+                       maxStatus = grid[id];
+                   }
+                    m = m * grid[id];
+                    qf.union((i-1)*size + j-1, (i-1)*size + j-2);
+                    //System.out.println("Call this: maxStatus = " + maxStatus);
                }
-               if(i > 1 && isOpen(i-1,j))
+               if (i < size && isOpen(i+1, j))
                {
-                   qf.union( (i-1)*size + j-1, (i-2)*size + j-1 );
-               }                   
+//                   if ( topConnectedness[i][j-1]) 
+//                   {
+//                       topConnectedness[i-1][j-1] = true;
+//                   }
+                   int id = qf.find(i*size + j-1);
+                   if (maxStatus < grid[id])
+                   {
+                       maxStatus = grid[id];
+                   }
+                   m = m * grid[id];
+                   qf.union((i-1)*size + j-1, i*size + j-1);
+                   //System.out.println("Call this: maxStatus = " + maxStatus);
+               }
+               if (i > 1 && isOpen(i-1, j))
+               {
+//                   if ( topConnectedness[i-2][j-1]) 
+//                   {
+//                       topConnectedness[i-1][j-1] = true;
+//                   }
+                   int id = qf.find((i-2)*size + j-1);
+//System.out.println("Call this: maxStatus = " + maxStatus + " " +grid[id] );
+                   if (maxStatus < grid[id])
+                   {
+                       maxStatus = grid[id];
+                       
+                   }
+                   m = m * grid[id];
+                   qf.union((i-1)*size + j-1, (i-2)*size + j-1);
+                   //System.out.println("Call this: maxStatus = " + maxStatus);
+               }           
+               int id = qf.find((i-1)*size + j-1);
+               grid[id] = maxStatus;
+               if (!percolate && m % 6 == 0)
+               {
+                   percolate = true;
+               }
           }
        }
        else
@@ -70,9 +116,9 @@ public class Percolation {
      }
    public boolean isOpen(int i, int j)     // is site (row i, column j) open?
      {
-       if(i>0 && i<size+1 && j>0 && j<size+1)
+       if (i > 0 && i < size+1 && j > 0 && j < size+1)
        {
-         return grid[i-1][j-1];
+         return grid[(i-1)*size + j-1] != 0;
        }
        else
        {
@@ -82,13 +128,13 @@ public class Percolation {
      }
    public boolean isFull(int i, int j)     // is site (row i, column j) full?
    {
-      if(i>0 && i<size+1 && j>0 && j<size+1 )
+      if (i > 0 && i < size+1 && j > 0 && j < size+1)
       {
-         if (isOpen(i,j))
-         {
-               return (qf.connected((i-1)*size + j-1, top));
-         }
-         return false;
+         //if (isOpen(i,j))
+         //{
+               return grid[qf.find((i-1)*size + j-1)] == 3;
+         //}
+         //return false;
        }
        else
        {
@@ -98,7 +144,9 @@ public class Percolation {
    public boolean percolates()             // does the system percolate?
    {
      //logic here
-      return qf.connected(bot, top);
+       //System.out.println("max : " + max);
+      //return max == 3;
+       return percolate;
    }
 
    public static void main(String[] args)   // test client (optional)
@@ -107,11 +155,10 @@ public class Percolation {
       int[] inn = input.readAllInts();
       Percolation data = new Percolation(inn[0]);
       //System.out.println(String.format("Size of input: %d", inn.length));
-      for(int i = 1; i< inn.length; i++)
+      for (int i = 1; i < inn.length/2; i++)
       {
-          //System.out.println(String.format("value[%d]: %d | %d",i, inn[i],inn[i+1]));
-          data.open(inn[i],inn[i+1]);
-          i++;
+         
+          data.open(inn[2*i+1], inn[2*i+2]);
       }
       if (data.percolates())
       {
