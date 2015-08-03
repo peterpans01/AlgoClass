@@ -26,7 +26,7 @@ public class Deque<Item> implements Iterable<Item> {
        return N == 0;
        //return dll.isEmpty();
    }
-   public int size()                        // return the number of items on the deque
+   public int size()  // return the number of items on the deque
    {
        return N;
    }
@@ -60,7 +60,7 @@ public class Deque<Item> implements Iterable<Item> {
        last.prev = l;
        N++;
    }
-   public Item removeFirst()                // remove and return the item from the front
+   public Item removeFirst() // remove and return the item from the front
    {
        if (isEmpty())
        {
@@ -72,7 +72,7 @@ public class Deque<Item> implements Iterable<Item> {
        N--;
        return oldfirst.item;
    }
-   public Item removeLast()                 // remove and return the item from the end
+   public Item removeLast() // remove and return the item from the end
    {
        if (isEmpty())
        {
@@ -85,7 +85,8 @@ public class Deque<Item> implements Iterable<Item> {
        N--;
        return oldlast.item;
    }
-   public Iterator<Item> iterator()         // return an iterator over items in order from front to end
+   public Iterator<Item> iterator()// return an iterator over items
+   //in order from front to end
    {
        return new DequeIterator<Item>(first);
    }
