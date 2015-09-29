@@ -76,8 +76,8 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
        if (chosen != (last-1 + q.length) % q.length)
        {
           q[chosen] = q[(last-1 + q.length) % q.length];
-          q[(last-1 + q.length) % q.length] = null; 
        }
+       q[(last-1 + q.length) % q.length] = null;
        N--;
        if (last == 0)
        {
@@ -118,7 +118,7 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         private Item[] arr;
         public RQIterator() {
             arr = (Item[]) new Object[N];
-            for (int j = 0; j < N; j ++)
+            for (int j = 0; j < N; j++)
             {
                 arr[j] = q[(j + first) % q.length];
             }
@@ -144,10 +144,10 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
        dq.enqueue(9);
        dq.enqueue(8);
        
-       for (Integer i : dq)
+       for (int i : dq)
        {
            StdOut.println(">" + i);
-           for (Integer j : dq)
+           for (int j : dq)
                StdOut.println("+" + j);
            StdOut.println("-----------------------");
        }
