@@ -1,0 +1,41 @@
+/*Queue with two stacks. 
+ * Implement a queue with two stacks so that each queue operations takes a constant amortized number of stack operations.
+ * */
+import edu.princeton.cs.algs4.Stack;
+public class Queue2Stacks<Item> implements Iterable<Item>
+{
+    Stack s1, s2;
+    int N;
+    public Queue2Stacks()
+    {
+        s1 = new Stack();
+        s2 = new Stack();
+    }
+    public void enqueue(Item item)
+    {
+        if ((s2.isEmpty()))
+        {
+            while(!s1.isEmpty())
+            {
+                s2.push(s1.pop());
+            }
+        }
+        s1.push(item);
+    }
+    public Item dequeue()
+    {
+        return s2.pop();
+    }
+    public boolean isEmpty()
+    {
+        return s1.isEmpty() && s2.isEmpty();
+    }
+    public int size()
+    {
+        return s1.size() + s2.size();
+    }
+    public static void main(String[] args)
+    {
+        
+    }
+}
