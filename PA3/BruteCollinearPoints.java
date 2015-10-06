@@ -32,6 +32,7 @@ public class BruteCollinearPoints {
                throw new java.lang.IllegalArgumentException();
        }
        
+       result = new ResizingArrayBag<LineSegment>();
        //generate the next combination base on the assumption we are working on
        // the index of array ( so the set is: {0,1,2,..,N-1}) and we need choose 4 from
        //them. The algorithm is:
