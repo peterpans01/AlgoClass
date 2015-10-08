@@ -62,9 +62,9 @@ public class Point implements Comparable<Point> {
     public double slopeTo(Point that) {
         /* YOUR CODE HERE */
         
+        if (this.compareTo(that) == 0) return Double.NEGATIVE_INFINITY;
         double t = that.x - this.x;
         if (t == 0) return Double.POSITIVE_INFINITY;
-        if (this.compareTo(that) == 0) return Double.NEGATIVE_INFINITY;
         if (that.y == this.y) return +0.0;
         return (that.y - this.y)/t;
     }
@@ -92,13 +92,13 @@ public class Point implements Comparable<Point> {
     }
     private class SlopeOrder implements Comparator<Point>
     {
-        public int compare(Point u,Point v)
+        public int compare(Point u, Point v)
         {
-            double s_u = slopeTo(u);
-            double s_v = slopeTo(v);
-            if (s_u < s_v) return -1;
-            else if(s_u > s_v) return 1;
-            else return u.compareTo(v);
+            double su = slopeTo(u);
+            double sv = slopeTo(v);
+            if (su < sv) return -1;
+            else if (su > sv) return 1;
+            else return 0;
         }
     }
     /**
@@ -131,33 +131,20 @@ public class Point implements Comparable<Point> {
      */
     public static void main(String[] args) {
         /* YOUR CODE HERE */
-//        Point p1 = new Point(0,0);
-//        Point p2 = new Point(1,2);
-//        Point p3 = new Point(2,3);
-//        Point p4 = new Point(3,4);
-//        Point p5 = new Point(4,5);
-        
-//        System.out.println("Slope of " + p2 + " with " + p1 + " is " + p1.slopeTo(p2) );
-//        System.out.println("Slope of " + p3 + " with " + p1 + " is " + p1.slopeTo(p3) );
-//        System.out.println("Slope of " + p4 + " with " + p1 + " is " + p1.slopeTo(p4) );
-//        System.out.println("Slope of " + p5 + " with " + p1 + " is " + p1.slopeTo(p5) );
-//        p1.drawTo(p2);
-//        p1.drawTo(p3);
-//        p1.drawTo(p4);
-//        p1.drawTo(p5);
-        Point[] a = new Point[5];
-        a[0] = new Point(1,0);
-        a[3] = new Point(3,3);
-        a[4] = new Point(3,4);
-        a[1] = new Point(4,5);
-        a[2] = new Point(0,5);
-        Point r = new Point(0,0);
-        MergeX.sort(a, r.slopeOrder());
-        
-        System.out.println("The order of a is:");
-        for (int i = 0; i < 5; i++)
-            System.out.println(a[i]);
-        System.out.println("==============================");
+//        Point[] a = new Point[6];
+//        a[0] = new Point(1, 0);
+//        a[3] = new Point(3, 3);
+//        a[4] = new Point(3, 4);
+//        a[1] = new Point(4, 5);
+//        a[2] = new Point(0, 5);
+//        a[5] = new Point(0, 5);
+//        Point r = new Point(0, 0);
+//        MergeX.sort(a);
+//        
+//        System.out.println("The order of a is:");
+//        for (int i = 0; i < 6; i++)
+//            System.out.println(a[i]);
+//        System.out.println("==============================");
         
         
     }
