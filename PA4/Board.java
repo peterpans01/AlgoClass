@@ -4,18 +4,20 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
 public class Board {
-    private int[][] m_board;
+    private char[] m_board;
+    private char N;
     public Board(int[][] blocks)           // construct a board from an N-by-N 
     {
-        m_board = new int[blocks.length][blocks.length];
-        for (int i = 0; i < m_board.length; i++)
-            for (int j = 0; j < m_board.length; j++)
+        N = blocks.length;
+        m_board = new char[N*N]; 
+        for (int i = 0; i < blocks.length; i++)
+            for (int j = 0; j < blocks.length; j++)
             { 
                 int k = blocks[i][j];
-                if (k > 0 && k < m_board.length*m_board.length)
-                    m_board[i][j] = blocks[i][j];
+                if (k > 0 && k < m_board.length)
+                    m_board[i*N + j] = blocks[i][j];
                 else
-                    m_board[i][j] = 0;
+                    m_board[i*N + j] = 0;
             }
     }
                                            // array of blocks
@@ -23,21 +25,20 @@ public class Board {
                                            // row i, column j)
     public int dimension()                 // board dimension N
     {
-        return m_board.length;
+        return N;
     }
         
     public int hamming()                   // number of blocks out of place
     {
         int count = 0;
         for (int i = 0; i < m_board.length; i++)
-            for (int j = 0; j < m_board.length; j++)
-            {
-               if (m_board[i][j]!=0)
+        {
+               if (m_board[i]!=0)
                {
-                   if (m_board[i][j]!=i*m_board.length + j + 1)
+                   if (m_board[i]!=i + 1)
                        count+=1;
                }
-            }
+        }
         return count;
     }
     public int manhattan()// sum of Manhattan distances between blocks and goal
@@ -61,23 +62,28 @@ public class Board {
     }
     public Board twin()// a board that is obtained by 
     {                  // exchanging any pair of blocks
-        StdOut.println("Start debug ==============");
+        StdOut.println("Start debug ============== ");
         int i_2 = 0, j_2 = 0;
+        boolean found = false;
         for (int i = 0; i < m_board.length; i++)
         {
             for (int j = 0; j < m_board.length; j++)
             {
+                System.out.print(m_board[i][j] + " ");
                 if(m_board[i][j] != 0)
                 {
                     i_2 = i;
                     j_2 = j;
+                    if(found == false) 
+                    {
+                        found = true;
+                    }
                     break;
                 }
-                else
-                {
-                    StdOut.print(m_board[i][j]);
-                }
+    
             }
+            if (found)
+                break;
          }
         StdOut.println("\n end debug ==============");
         StdOut.println("i_2 = " + i_2 + " j_2 = " + j_2);
