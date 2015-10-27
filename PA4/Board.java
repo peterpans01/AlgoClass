@@ -8,14 +8,14 @@ public class Board {
     private char N;
     public Board(int[][] blocks)           // construct a board from an N-by-N 
     {
-        N = blocks.length;
+        N = (char) blocks.length;
         m_board = new char[N*N]; 
         for (int i = 0; i < blocks.length; i++)
             for (int j = 0; j < blocks.length; j++)
             { 
                 int k = blocks[i][j];
                 if (k > 0 && k < m_board.length)
-                    m_board[i*N + j] = blocks[i][j];
+                    m_board[i*N + j] = (char) blocks[i][j];
                 else
                     m_board[i*N + j] = 0;
             }
@@ -45,67 +45,58 @@ public class Board {
     {
         int dis = 0;
         for (int i = 0; i < m_board.length; i++)
-            for (int j = 0; j < m_board.length; j++)
+        {
+            if (m_board[i] != 0)
             {
-               if (m_board[i][j]!=0)
-               {
-                  dis+= Math.abs(m_board[i][j]%m_board.length - j)
-                      + Math.abs(m_board[i][j]/m_board.length - i);
-               }
+                char x = (char) Math.abs(m_board[i]-1-i);
+                dis+= (int) (x/N) + (int) (x%N);
             }
-        
+        }
         return dis;
     }
     public boolean isGoal() // is this board the goal board?
     {
-        return hamming()==0;
+        for (int i = 0; i < m_board.length-1; i++)
+        {
+            if(m_board[i] != (char) i+1)
+                return false;
+        }
+        return true;
     }
     public Board twin()// a board that is obtained by 
     {                  // exchanging any pair of blocks
-        StdOut.println("Start debug ============== ");
-        int i_2 = 0, j_2 = 0;
-        boolean found = false;
+        
+        int i_1 = -1;
+        int i_2 = -1;
+        while(i_1 == -1 && i_2 == -1)
+        {
+            if(i_1 == -1)
+            {
+                while(i_1 == -1 || m_board[i_1] == 0)
+                {
+                    i_1 = StdRandom.uniform(0, N);
+                }
+            }
+            
+            if(i_2 == -1)
+            {
+                while(i_2 == -1 || m_board[i_2] == 0 || i_2 == i_1)
+                {
+                    i_2 = StdRandom.uniform(0, N);
+                }
+            }
+        }
+
+        int[][] temp_blocks = new int[N][N];
         for (int i = 0; i < m_board.length; i++)
         {
-            for (int j = 0; j < m_board.length; j++)
-            {
-                System.out.print(m_board[i][j] + " ");
-                if(m_board[i][j] != 0)
-                {
-                    i_2 = i;
-                    j_2 = j;
-                    if(found == false) 
-                    {
-                        found = true;
-                    }
-                    break;
-                }
-    
-            }
-            if (found)
-                break;
-         }
-        StdOut.println("\n end debug ==============");
-        StdOut.println("i_2 = " + i_2 + " j_2 = " + j_2);
-        int i_1 = StdRandom.uniform(m_board.length);
-        int min = 0, max =  m_board.length;
-        if (i_1 == 0)
-            min = 1;
-        if (i_1 == m_board.length - 1)
-            max = m_board.length - 1;
-        int j_1 = StdRandom.uniform(min,max);
-        StdOut.println("i_1 = " + i_1 + " j_1 = " + j_1);
-        int[][] temp_blocks = new int[m_board.length][m_board.length];
-        for (int i = 0; i < m_board.length; i++)
-            for (int j = 0; j < m_board.length; j++)
-            {
-               if(i == i_2 && j == j_2)
-                   temp_blocks[i][j] = m_board[i_1][j_1];
-               else if (i == i_1 && j == j_1)
-                   temp_blocks[i][j] = m_board[i_2][j_2];
+               if(i == i_2)
+                   temp_blocks[i/N][i%N] = m_board[i_1];
+               else if (i == i_1)
+                   temp_blocks[i/N][i%N] = m_board[i_2];
                else
-                   temp_blocks[i][j] = m_board[i][j];
-            }
+                   temp_blocks[i/N][i%N] = m_board[i];
+        }
         return new Board(temp_blocks);
     }
     public boolean equals(Object y)        // does this board equal y?
@@ -119,74 +110,64 @@ public class Board {
             return false;
         for (int i = 0; i < m_board.length; i++)
         {
-            for (int j = 0; j < m_board.length; j++)
-            {
                 
-                if( m_board[i][j] != that.m_board[i][j])
+                if( m_board[i] != that.m_board[i])
                     return false;
-            }
         }
         return true;
     }
-    private void exchange(int[][] src, int[][] dst, int i_1, int j_1, int i_2, 
-                          int j_2)
+    private void exchange(char[] src, int[][] dst, int i_1, int i_2)
     {
         //dst = new int[src[0].length][src[0].length];
-        for (int i = 0; i < src[0].length; i++)
-            for (int j = 0; j < src[0].length; j++)
+        for (int i = 0; i < N; i++)
+            for (int j = 0; j < N; j++)
             {
-               if(i == i_2 && j == j_2)
-                   dst[i][j] = src[i_1][j_1];
-               else if (i == i_1 && j == j_1)
-                   dst[i][j] = src[i_2][j_2];
+               if(i * N + j  == i_2)
+                   dst[i][j] = (int) src[i_1];
+               else if (i * N + j == i_1)
+                   dst[i][j] = (int) src[i_2];
                else
-                   dst[i][j] = src[i][j];
+                   dst[i][j] = (int) src[i * N + j];
             }
     }
     public Iterable<Board> neighbors()     // all neighboring boards
     {
         Queue<Board> q = new Queue<Board>();
         int i_0 = 0;
-        int j_0 = 0;
         for (int i = 0; i < m_board.length; i++)
         {
-            for (int j = 0; j < m_board.length; j++)
-            {
-                
-                if( m_board[i][j] == 0)
+                if( m_board[i] == 0)
                 {
                     i_0 = i;
-                    j_0 = j;
+                    break;
                 }
-            }
         }
         
-        int N = m_board.length;
-        if(i_0 - 1 > 0)
+        if(i_0 % N > 0)
         {
             int[][] dst1 = new int[N][N];
-            exchange(m_board, dst1, i_0, j_0, i_0 - 1, j_0);
+            exchange(m_board, dst1, i_0, i_0 - 1);
             q.enqueue(new Board(dst1));
         }
         
-        if(i_0 + 1 < m_board[0].length)
+        if(i_0 % N < N -1)
         {
             int[][] dst2 = new int[N][N];
-            exchange(m_board, dst2, i_0, j_0, i_0 + 1, j_0);
+            exchange(m_board, dst2, i_0, i_0 + 1);
             q.enqueue(new Board(dst2));
         }
         
-        if(j_0 + 1 < m_board[0].length)
+        if(i_0 / N < N - 1)
         {
             int[][] dst3 = new int[N][N];
-            exchange(m_board, dst3, i_0, j_0, i_0, j_0 + 1);
+            exchange(m_board, dst3, i_0, i_0 + N);
             q.enqueue(new Board(dst3));
         }
         
-        if(j_0 - 1 > 0)
+        if(i_0 / N > 0)
         {
             int[][] dst4 = new int[N][N];
-            exchange(m_board, dst4, i_0, j_0, i_0, j_0 - 1);
+            exchange(m_board, dst4, i_0, i_0 - N);
             q.enqueue(new Board(dst4));
         }
         return q;
@@ -195,14 +176,14 @@ public class Board {
     public String toString() // string representation of this board (in the 
     {                        // output format specified below)
         StringBuilder s = new StringBuilder();
-        for (int i = 0; i < m_board.length; i++)
+        for (int i = 0; i < N; i++)
         {
            
-            for (int j = 0; j < m_board.length; j++)
+            for (int j = 0; j < N; j++)
             {
-                if( m_board[i][j] != 0)
+                if( m_board[i * N + j] != 0)
                 {
-                    s.append(String.format("%2d ", m_board[i][j]));
+                    s.append(String.format("%2d ", (int) m_board[i * N + j]));
                 }
                 else
                 {
