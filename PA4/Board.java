@@ -6,9 +6,11 @@ import edu.princeton.cs.algs4.StdOut;
 public class Board {
     private char[] m_board;
     private char N;
+    private int man_dis;
     public Board(int[][] blocks)           // construct a board from an N-by-N 
     {
         N = (char) blocks.length;
+        man_dis = -1;
         m_board = new char[N*N]; 
         for (int i = 0; i < blocks.length; i++)
             for (int j = 0; j < blocks.length; j++)
@@ -43,16 +45,17 @@ public class Board {
     }
     public int manhattan()// sum of Manhattan distances between blocks and goal
     {
-        int dis = 0;
+        if(man_dis != -1) return man_dis;
+        man_dis = 0;
         for (int i = 0; i < m_board.length; i++)
         {
             if (m_board[i] != 0)
             {
                 //char x = (char) Math.abs(m_board[i]-1-i);
-                dis+= (int) (Math.abs((m_board[i]-1)/N - i/N)) + (int) (Math.abs((m_board[i]-1)%N - i%N));
+                man_dis+= (int) (Math.abs((m_board[i]-1)/N - i/N)) + (int) (Math.abs((m_board[i]-1)%N - i%N));
             }
         }
-        return dis;
+        return man_dis;
     }
     public boolean isGoal() // is this board the goal board?
     {
@@ -72,18 +75,18 @@ public class Board {
         {
             if(i_1 == -1)
             {
-                while(i_1 == -1 || m_board[i_1] == 0)
+                do
                 {
                     i_1 = StdRandom.uniform(0, N);
-                }
+                }while(m_board[i_1] == 0);
             }
             
-            if(i_2 == -1)
+            if(i_1 != -1 && i_2 == -1)
             {
-                while(i_2 == -1 || m_board[i_2] == 0 || i_2 == i_1)
+                do
                 {
                     i_2 = StdRandom.uniform(0, N);
-                }
+                }while( m_board[i_2] == 0 || i_2 == i_1);
             }
         }
 

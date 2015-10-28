@@ -8,7 +8,7 @@ import edu.princeton.cs.algs4.Stack;
 
 
 public class Solver {
-    //public static boolean DEBUG = false;
+    public static boolean DEBUG = false;
     //private ST<Board,Board> solution;
     //private boolean solvable;
     //ST<Board, int> cost_so_far;
@@ -75,16 +75,23 @@ public class Solver {
         }
     }
     
-    public Solver(Board initial, int limit)           // find a solution to the initial board (using the A* algorithm)
+    public Solver(Board initial) //, int limit          // find a solution to the initial board (using the A* algorithm)
     {
         //goal = null;
         if (initial == null)
         {
             throw new java.lang.NullPointerException();
         }
+        
         MinPQ<Node> series = new MinPQ<Node>();
         Node f1 = new Node(initial,0,null);
         series.insert(f1);
+        StdOut.println("============");
+        Board twin = initial.twin();
+        StdOut.println("==" + twin);
+        MinPQ<Node> Qtwin = new MinPQ<Node>();
+        Node f2 = new Node(twin,0,null);
+        Qtwin.insert(f2);
         
         path = new Stack<Board>();
         //solution = new ST<Board, Board>();
@@ -94,25 +101,30 @@ public class Solver {
         //cost_so_far.put(initial,0);
         
 //        int count = 0;
-        while( !series.isEmpty() ) //&& count != limit
+        while( !series.isEmpty() && !Qtwin.isEmpty()) //&& count != limit
         {
-            count++;
-            if(DEBUG)
-            {
-                StdOut.println("=================DEBUG==================" + count);
-                for (Node n : series)
-                {
-                    StdOut.println(n.ManhattanPro() +" | " + n.getBoard().manhattan() + "\n" + n.getBoard());
-                }
-            }
-            
+            //count++;
+//            if(DEBUG)
+//            {
+//                StdOut.println("=================DEBUG==================" );//+ count
+//                for (Node n : series)
+//                {
+//                    StdOut.println(n.ManhattanPro() +" | " + n.getBoard().manhattan() + "\n" + n.getBoard());
+//                }
+//            }
+            StdOut.println(".......");
             Node current = series.delMin();
-            Board cb = current.getBoard();
-            if(DEBUG)
+            Node cTwin = Qtwin.delMin();
+            //Board cb = current.getBoard();
+//            if(DEBUG)
+//            {
+//                StdOut.println("============== CCURRENT ==============");
+//                StdOut.println(cb);
+//                StdOut.println("==============END OF DEBUG==============");
+//            }
+            if(cTwin.goal())
             {
-                StdOut.println("============== CCURRENT ==============");
-                StdOut.println(cb);
-                StdOut.println("==============END OF DEBUG==============");
+                break;
             }
             if( current.goal() )
             {
@@ -123,13 +135,23 @@ public class Solver {
                 }
                 break;
             }
-            for (Board t: cb.neighbors())
+            for (Board t: current.getBoard().neighbors())
             {
                 int new_cost = current.getMove() + 1;
                 if(current.getPrev() == null || !t.equals(current.getPrev().getBoard()))
                 {
                     //cost_so_far.put(t,new_cost);
                     series.insert(new Node(t, new_cost, current));
+                    //solution.put(t,cb);
+                }
+            }
+            for (Board u: cTwin.getBoard().neighbors())
+            {
+                int new_costT = cTwin.getMove() + 1;
+                if(cTwin.getPrev() == null || !u.equals(cTwin.getPrev().getBoard()))
+                {
+                    //cost_so_far.put(t,new_cost);
+                    Qtwin.insert(new Node(u, new_costT, cTwin));
                     //solution.put(t,cb);
                 }
             }
@@ -192,12 +214,12 @@ public class Solver {
 //            StdOut.println("[hamming]   " + i + " : " + t_a[i].hammingPro());
 //            StdOut.println("[Manhattan] " + i + " : " + t_a[i].ManhattanPro());
 //        }
-        if( initial == null)
-        {
-            StdOut.println("NULL POINTER");
-        }
+//        if( initial == null)
+//        {
+//            StdOut.println("NULL POINTER");
+//        }
         // solve the puzzle
-        Solver solver = new Solver(initial, limit);
+        Solver solver = new Solver(initial);//, limit
         
         // print solution to standard output
         if (!solver.isSolvable())
