@@ -48,8 +48,8 @@ public class Board {
         {
             if (m_board[i] != 0)
             {
-                char x = (char) Math.abs(m_board[i]-1-i);
-                dis+= (int) (x/N) + (int) (x%N);
+                //char x = (char) Math.abs(m_board[i]-1-i);
+                dis+= (int) (Math.abs((m_board[i]-1)/N - i/N)) + (int) (Math.abs((m_board[i]-1)%N - i%N));
             }
         }
         return dis;

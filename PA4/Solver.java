@@ -3,19 +3,24 @@ import edu.princeton.cs.algs4.MinPQ;
 import java.lang.NullPointerException;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.Queue;
+import edu.princeton.cs.algs4.ST;
+import edu.princeton.cs.algs4.Stack;
 
 
 public class Solver {
-    private Queue<Board> solution;
-    private boolean solvable;
+    //public static boolean DEBUG = false;
+    //private ST<Board,Board> solution;
+    //private boolean solvable;
+    //ST<Board, int> cost_so_far;
+    private Stack<Board> path;
+    //private Board goal;
     private static class Node implements Comparable<Node>
     {
         private Board board;
         private int move;
-        private Board prev;
+        private Node prev;
         
-        public Node(Board _board,int _move,Board _prev)
+        public Node(Board _board,int _move,Node _prev)
         {
             board = _board;
             move  = _move;
@@ -33,7 +38,12 @@ public class Solver {
             
         public int compareTo(Node that)
         {
-            return hammingPro() - that.hammingPro();
+//            if(hammingPro() == that.hammingPro())
+//                return board.hamming() - that.board.hamming();
+//            return hammingPro() - that.hammingPro();
+            if (ManhattanPro() == that.ManhattanPro())
+                return board.manhattan() - that.board.manhattan();
+            return ManhattanPro() - that.ManhattanPro();
         }
         public boolean goal()
         {
@@ -43,7 +53,7 @@ public class Solver {
         {
             return move;
         }
-        public Board getPrev()
+        public Node getPrev()
         {
             return prev;
         }
@@ -65,59 +75,102 @@ public class Solver {
         }
     }
     
-    public Solver(Board initial)           // find a solution to the initial board (using the A* algorithm)
+    public Solver(Board initial, int limit)           // find a solution to the initial board (using the A* algorithm)
     {
+        //goal = null;
         if (initial == null)
         {
             throw new java.lang.NullPointerException();
         }
         MinPQ<Node> series = new MinPQ<Node>();
         Node f1 = new Node(initial,0,null);
-        solution = new Queue<Board>();
         series.insert(f1);
-        solvable = false;
-        while( !series.isEmpty() )
+        
+        path = new Stack<Board>();
+        //solution = new ST<Board, Board>();
+        //solution.put(initial, null);
+        
+        //cost_so_far = new ST<Board, int>();
+        //cost_so_far.put(initial,0);
+        
+//        int count = 0;
+        while( !series.isEmpty() ) //&& count != limit
         {
+            count++;
+            if(DEBUG)
+            {
+                StdOut.println("=================DEBUG==================" + count);
+                for (Node n : series)
+                {
+                    StdOut.println(n.ManhattanPro() +" | " + n.getBoard().manhattan() + "\n" + n.getBoard());
+                }
+            }
+            
             Node current = series.delMin();
             Board cb = current.getBoard();
-            solution.enqueue(cb);
+            if(DEBUG)
+            {
+                StdOut.println("============== CCURRENT ==============");
+                StdOut.println(cb);
+                StdOut.println("==============END OF DEBUG==============");
+            }
             if( current.goal() )
             {
-                solvable = true;
+                while (current != null)
+                {
+                    path.push(current.getBoard());
+                    current = current.getPrev();
+                }
                 break;
             }
             for (Board t: cb.neighbors())
             {
-                if(!t.equals(current.getPrev()))
+                int new_cost = current.getMove() + 1;
+                if(current.getPrev() == null || !t.equals(current.getPrev().getBoard()))
                 {
-                    series.insert(new Node(t, current.getMove() + 1, cb));
+                    //cost_so_far.put(t,new_cost);
+                    series.insert(new Node(t, new_cost, current));
+                    //solution.put(t,cb);
                 }
             }
         }
+        //StdOut.println("RESULT : " + path.size());
     }
     public boolean isSolvable()            // is the initial board solvable?
     {
-        return solvable;
+        return path.size() != 0;
     }
     public int moves()                     // min number of moves to solve initial board; -1 if unsolvable
     {
-        if(solvable)
-        {
-            return solution.size() -1;
-        }
-        return -1;
+        return path.size() -1;
     }
     public Iterable<Board> solution()      // sequence of boards in a shortest solution; null if unsolvable
     {
-        if(solvable)
+        
+        if(isSolvable())
         {
-            return solution;
+            return path;
         }
         return null;
     }
     public static void main(String[] args) // solve a slider puzzle (given below)
     {
-
+        DEBUG = false;
+        int limit = -1;
+        int count = 0;
+        for(String s: args)
+        {
+            if(s.compareTo("-debug") == 0)
+            {
+                DEBUG = true;
+            }
+            if(s.compareTo("-limit") == 0)
+            {
+                limit = Integer.parseInt(args[count + 1]);
+            }
+            count++;  
+        }
+        //StdOut.println("LIMIT ======" + limit);
         // create initial board from file
         In in = new In(args[0]);
         int N = in.readInt();
@@ -144,7 +197,7 @@ public class Solver {
             StdOut.println("NULL POINTER");
         }
         // solve the puzzle
-        Solver solver = new Solver(initial);
+        Solver solver = new Solver(initial, limit);
         
         // print solution to standard output
         if (!solver.isSolvable())
