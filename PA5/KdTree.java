@@ -56,11 +56,11 @@ public class KdTree {
            
            if(compare)
            {
-              tmp = new RectHV(iRect.xmin(), iRect.ymin(), iP.x(), iRect.ymax());
+              tmp = new RectHV(iRect.xmin(), iRect.ymin(), x.p.x(), iRect.ymax());
            }
            else
            {
-               tmp = new RectHV(iRect.xmin(), iRect.ymin(), iRect.xmax(), iP.y());
+               tmp = new RectHV(iRect.xmin(), iRect.ymin(), iRect.xmax(), x.p.y());
            }
            x.lb  = insert(x.lb,  iP, tmp, !compare);
        }
@@ -68,11 +68,11 @@ public class KdTree {
        {
            if(compare)
            {
-              tmp = new RectHV(iP.x(), iRect.ymin(), iRect.xmax(), iRect.ymax());
+              tmp = new RectHV(x.p.x(), iRect.ymin(), iRect.xmax(), iRect.ymax());
            }
            else
            {
-               tmp = new RectHV(iRect.xmin(), iP.y(), iRect.xmax(), iRect.ymax());
+               tmp = new RectHV(iRect.xmin(), x.p.y(), iRect.xmax(), iRect.ymax());
            }
            x.rt = insert(x.rt, iP, tmp, !compare);
        }
