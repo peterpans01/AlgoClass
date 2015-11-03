@@ -45,9 +45,13 @@ public class KdTree {
    // add the point to the set (if it is not already in the set)
    public              void insert(Point2D p)
    {
+       if (p == null)
+       {
+           throw new java.lang.NullPointerException();
+       }
        if (contains(p))
        {
-           StdOut.println("Point " + p + " missing from list");
+           //StdOut.println("Point " + p + " missing from list");
            return;
        }
        mRoot = insert(mRoot, p, new RectHV(0.0, 0.0, 1.0, 1.0), true);
@@ -112,6 +116,7 @@ public class KdTree {
    private boolean contains(Node x, Point2D p, boolean compare)
    {
        if (x == null) return false;
+       if (p.equals(x.p)) return true;
        int cmp = compare2(p, x.p, compare);
        if (cmp < 0) return contains(x.lb, p, !compare);
        else return contains(x.rt, p, !compare); //if (cmp > 0)
@@ -172,6 +177,10 @@ public class KdTree {
    // a nearest neighbor in the set to point p; null if the set is empty
    public           Point2D nearest(Point2D p)
    {
+       if(mRoot == null)
+       {
+           return null;
+       }
        Point2D nearestPoint = mRoot.p;
        Stack<Node> iter = new Stack<Node>();
        iter.push(mRoot);
