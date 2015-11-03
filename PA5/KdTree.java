@@ -152,6 +152,8 @@ public class KdTree {
    public Iterable<Point2D> range(RectHV rect)  
    {
        Queue<Point2D> points = new Queue<Point2D>();
+       if (mRoot == null)
+             return points;
        Stack<Node> iter = new Stack<Node>();
        iter.push(mRoot);
        while (!iter.isEmpty())
