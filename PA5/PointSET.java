@@ -1,8 +1,8 @@
 import edu.princeton.cs.algs4.SET;
 import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
-import edu.princeton.cs.algs4.StdOut;
-import edu.princeton.cs.algs4.StdDraw;
+//import edu.princeton.cs.algs4.StdOut;
+//import edu.princeton.cs.algs4.StdDraw;
 
 public class PointSET {
     private SET<Point2D> mPoints;
@@ -60,7 +60,7 @@ public class PointSET {
            throw new java.lang.NullPointerException();
        }
        SET<Point2D> setPoint = new SET<Point2D>();
-       for ( Point2D p1 :  mPoints)
+       for (Point2D p1 :  mPoints)
        {
            if (rect.contains(p1))
            {
@@ -82,7 +82,7 @@ public class PointSET {
        }
        double min = -1.0;
        Point2D nearestPoint = new Point2D(0.0, 0.0);
-       for ( Point2D p1 :  mPoints)
+       for (Point2D p1 :  mPoints)
        {
            double d = p.distanceTo(p1);
            if (min < 0 || d < min)
