@@ -39,12 +39,15 @@ public class SAP {
    {
        if (cache[v][w] != null)
            return cache[v][w].getLength();
-       return BFS(v,w);
+       int[] reach = new int[mGraph.V()];
+       return BFS(v, w, reach, mGraph.E());
    }
    
-   private int BFS(int v, int w, int bestSoFar = mGraph.E())
+   private int BFS(int v, int w,  int[] reach, int bestSoFar)
    {
-       int[] reach = new int[mGraph.V()];
+       //int[] reach = new int[mGraph.V()];
+       if (cache[v][w] != null)
+           return cache[v][w].getLength();
        LinkedQueue<Integer> queue = new LinkedQueue<Integer>();
        int left = 0;
        int l = 0;
@@ -137,15 +140,48 @@ public class SAP {
    // in v and any vertex in w; -1 if no such path
    public int length(Iterable<Integer> v, Iterable<Integer> w)
    {
-       
-       return -1;
+       int bestSoFar = mGraph.E();
+       //int bestAncestor = -1;
+       int[] reach = new int[mGraph.V()];
+       for (int mV : v)
+       {
+           for (int mW : w)
+           {
+               Arrays.fill(reach, 0);
+               int temp = BFS(mV,mW,reach,bestSoFar);
+               if (temp > 0 && temp < bestSoFar)
+               {
+                   bestSoFar = temp;
+                   //bestAncestor = ancestor(mV,mW);
+               }
+           }
+       }
+       if (bestSoFar == mGraph.E())
+           return -1;
+       return bestSoFar;
    }
 
    // a common ancestor that participates in shortest 
    // ancestral path; -1 if no such path
    public int ancestor(Iterable<Integer> v, Iterable<Integer> w)
    {
-       return -1;
+       int bestSoFar = mGraph.E();
+       int bestAncestor = -1;
+       int[] reach = new int[mGraph.V()];
+       for (int mV : v)
+       {
+           for (int mW : w)
+           {
+               Arrays.fill(reach, 0);
+               int temp = BFS(mV,mW,reach,bestSoFar);
+               if (temp > 0 && temp < bestSoFar)
+               {
+                   bestSoFar = temp;
+                   bestAncestor = ancestor(mV,mW);
+               }
+           }
+       }
+       return bestAncestor;
    }
 
    // do unit testing of this class
