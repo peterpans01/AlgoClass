@@ -196,10 +196,11 @@ public class SAP {
        }
        
        //check if w is visited or not
-       if (marked[w])
-       {
-           bestSoFar = distTo[w];
-       }  
+//       if (marked[w])
+//       {
+//           bestSoFar = distTo[w];
+//           ancestor = w;
+//       }  
        queue.enqueue(w);
        //marked[w] = true;
        int[] distToW = new int[mGraph.V()];
