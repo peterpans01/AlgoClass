@@ -25,7 +25,7 @@ public class Outcast {
            {
                dis += wn.distance(nouns[i], nouns[j]);
            }
-           StdOut.println( nouns[i] +  " : " + dis);
+           //StdOut.println( nouns[i] +  " : " + dis);
            if (dis > max)
            {
                max = dis;

@@ -37,7 +37,7 @@ public class SAP {
    // constructor takes a digraph (not necessarily a DAG)
    public SAP(Digraph G)
    {
-       mGraph = G;
+       mGraph = new Digraph(G);
        //cache = new Node[G.V()][G.V()];
        //cache = new int[G.V()][G.V()];
        //Arrays.fill(cache, -1);
@@ -69,44 +69,71 @@ public class SAP {
    {
        Queue<Integer> q = new Queue<Integer>();
        boolean[] marked = new boolean[mGraph.V()];
+       //boolean[] group = new boolean[mGraph.V()];
        int[] distTo = new int[mGraph.V()];
         for (int v1 = 0; v1 < mGraph.V(); v1++)
             distTo[v1] = INFINITY;
-       int[] edgeTo = new int[mGraph.V()];
+       //int[] edgeTo = new int[mGraph.V()];
+       int bestSoFar = mGraph.E();
         for (int s : v) {
             marked[s] = true;
+            //group[s] = true;
             distTo[s] = 0;
             q.enqueue(s);
         }
-        for (int s2 : w) {
-            marked[s2] = true;
-            distTo[s2] = 0;
-            q.enqueue(s2);
-        }
-        int ancestor = -1;
-       int distance = -1;
-        while (!q.isEmpty())
+        
+        
+       int ancestor = -1;
+       //int distance = -1;
+       while (!q.isEmpty())
        {
             int curr = q.dequeue();
+//            if (distTo[curr] > bestSoFar)
+//               break;
             for (Integer m : mGraph.adj(curr))
            {
                if (!marked[m]) {
-                    edgeTo[m] = curr;
+                    //edgeTo[m] = curr;
                     distTo[m] = distTo[curr] + 1;
                     marked[m] = true;
+                    //group[m] = group[curr]; 
                    q.enqueue(m);
                }
-               else
+   
+           }
+//           if (ancestor >= 0)
+//               break;
+       }
+       int[] distToW = new int[mGraph.V()];
+       for (int s2 : w) {
+            //marked[s2] = true;
+            distToW[s2] = 0;
+            q.enqueue(s2);
+        }
+       while (!q.isEmpty())
+       {
+           int curr = q.dequeue();
+           if (distToW[curr] > bestSoFar)
+               break;
+               
+           if(marked[curr])
+           {
+               if (bestSoFar > distTo[curr] + distToW[curr])
                {
-                   ancestor = m;
-                   distance = distTo[m] + distTo[curr] + 1;
-                   break;
+                   bestSoFar = distTo[curr] + distToW[curr];
+                   ancestor = curr;
                }
            }
-           if (ancestor >= 0)
-               break;
+           
+           for (Integer m :  mGraph.adj(curr))
+           {
+               q.enqueue(m);
+               distToW[m] = distToW[curr] + 1;
+           }
        }
-       return new Node(ancestor, distance);
+       if (ancestor == -1)
+           bestSoFar = -1;
+       return new Node(ancestor, bestSoFar);
    }
    
    private Node BFS(int v, int w)
@@ -114,23 +141,28 @@ public class SAP {
        //int[] reach = new int[mGraph.V()];
 //       if (cache[v][w] != null)
 //           return cache[v][w].getLength();
+       if (v == w)
+           return new Node(v, 0);
        Queue<Integer> queue = new Queue<Integer>();
        boolean[] marked = new boolean[mGraph.V()];
+       //boolean[] group = new boolean[mGraph.V()];
        int[] distTo = new int[mGraph.V()];
-       int[] edgeTo = new int[mGraph.V()];
+       //int[] edgeTo = new int[mGraph.V()];
         for (int v1 = 0; v1 < mGraph.V(); v1++)
             distTo[v1] = INFINITY;
+       int bestSoFar = mGraph.E();
        //int left = 0;
        //int l = 0;
        queue.enqueue(v);
-       queue.enqueue(w);
+       
        marked[v] = true;
+       //group[v] = true;
        distTo[v] = 0;
-       marked[w] = true;
+       
        distTo[w] = 0;
        //int bestSoFar = mGraph.E();
        int ancestor = -1;
-       int distance = -1;
+       //int distance = -1;
        while (!queue.isEmpty())
        {
 //           if (left == 0)
@@ -140,6 +172,7 @@ public class SAP {
 //           }
            //StdOut.println(Arrays.toString(reach));
            int curr = queue.dequeue();
+           
            //left--;
 //           if(curr == w)
 //           {
@@ -153,22 +186,66 @@ public class SAP {
            for (Integer m : mGraph.adj(curr))
            {
                if (!marked[m]) {
-                    edgeTo[m] = curr;
+                    //edgeTo[m] = curr;
                     distTo[m] = distTo[curr] + 1;
+                    //group[m] = group[curr]; 
                     marked[m] = true;
                    queue.enqueue(m);
                }
-               else
+           }
+       }
+       
+       //check if w is visited or not
+       if (marked[w])
+       {
+           bestSoFar = distTo[w];
+       }  
+       queue.enqueue(w);
+       //marked[w] = true;
+       int[] distToW = new int[mGraph.V()];
+       distToW[w] = 0;
+       while (!queue.isEmpty())
+       {
+           int curr = queue.dequeue();
+           if (distToW[curr] > bestSoFar)
+               break;
+               
+           if(marked[curr])
+           {
+               if (bestSoFar > distTo[curr] + distToW[curr])
                {
-                   ancestor = m;
-                   distance = distTo[m] + distTo[curr] + 1;
-                   break;
+                   bestSoFar = distTo[curr] + distToW[curr];
+                   ancestor = curr;
                }
            }
-           if (ancestor >= 0)
-               break;
+           
+           for (Integer m :  mGraph.adj(curr))
+           {
+               queue.enqueue(m);
+               distToW[m] = distToW[curr] + 1;
+           }
        }
-       return new Node(ancestor, distance);
+       if (ancestor == -1)
+           bestSoFar = -1;
+       return new Node(ancestor, bestSoFar);
+//       else
+//               {
+//                   
+//                   if (group[m] != group[curr])
+//                   {
+//                      int temp = distTo[m] + distTo[curr] + 1;
+//                      if(bestSoFar > temp)
+//                      {
+//                          ancestor = m;
+//                          bestSoFar = temp;
+//                          distance = temp;
+//                      } 
+//                   }
+//                   else
+//                   {
+//                       if(distTo[m] < )
+//                   }
+//               }
 //       queue.enqueue(w);
 //       left = 0;
 //       l = 0;
@@ -331,7 +408,7 @@ public class SAP {
     SAP sap = new SAP(G);
     if (t)
     {
-        StdOut.println("Chuoi : ");
+        //StdOut.println("Chuoi : ");
         while (!StdIn.isEmpty()) {
             String v1 = StdIn.readLine();
             String[] s1 = v1.split(" ");

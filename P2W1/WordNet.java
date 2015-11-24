@@ -159,9 +159,9 @@ public class WordNet {
        if (!isRootedDAG(mDi))
            throw new java.lang.IllegalArgumentException();
        sa = new SAP(mDi);
-       StdOut.println("========================");
-       StdOut.println(mDi);
-       StdOut.println("========================");
+       //StdOut.println("========================");
+       //StdOut.println(mDi);
+       //StdOut.println("========================");
 //       mHyper = new ST<Integer, int[]>();
 //       while (in.hasNextLine()) {
 //            String line = in.readLine();
@@ -192,20 +192,20 @@ public class WordNet {
 //       return s;
        return stSyn.keys();
    }
-   public void printMSyn()
-   {
-       for (String syn : stSyn.keys())
-       {
-           StdOut.println(syn + " | " + stSyn.get(syn));
-       }
-   }
-   public void printHyper()
-   {
-       for (int id : stID.keys())
-       {
-           StdOut.println(id + " | " + stID.get(id));
-       }
-   }
+//   public void printMSyn()
+//   {
+//       for (String syn : stSyn.keys())
+//       {
+//           StdOut.println(syn + " | " + stSyn.get(syn));
+//       }
+//   }
+//   public void printHyper()
+//   {
+//       for (int id : stID.keys())
+//       {
+//           StdOut.println(id + " | " + stID.get(id));
+//       }
+//   }
    // is the word a WordNet noun?
    public boolean isNoun(String word)
    {
@@ -259,14 +259,14 @@ public class WordNet {
    // do unit testing of this class
    public static void main(String[] args)
    {
-       WordNet a = new WordNet(args[0], args[1]);
-//       while (!StdIn.isEmpty()) {
-//           String s1 = StdIn.readString();
-//           String s2 = StdIn.readString();
-//           StdOut.println(s1 + " - " + s2 + " : " + 
-//                          a.distance(s1, s2) + " | " + a.sap(s1, s2));
-//       }
-       a.printMSyn();
-       a.printHyper();
+//       WordNet a = new WordNet(args[0], args[1]);
+////       while (!StdIn.isEmpty()) {
+////           String s1 = StdIn.readString();
+////           String s2 = StdIn.readString();
+////           StdOut.println(s1 + " - " + s2 + " : " + 
+////                          a.distance(s1, s2) + " | " + a.sap(s1, s2));
+////       }
+//       a.printMSyn();
+//       a.printHyper();
    }
 }
