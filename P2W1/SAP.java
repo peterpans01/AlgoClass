@@ -5,8 +5,6 @@ import edu.princeton.cs.algs4.Queue;
 
 import edu.princeton.cs.algs4.StdIn;
 import edu.princeton.cs.algs4.StdOut;
-//import edu.princeton.cs.algs4.BreadthFirstDirectedPaths;
-//import java.util.Arrays;
 
 //===========================================================================
 public class SAP {
@@ -31,264 +29,142 @@ public class SAP {
            return this.length;
        }
    }
-   //private Node[][] cache;
-   //private int[][] cache;
+   
    //private Queue<Interable<int>> recently;
-   // constructor takes a digraph (not necessarily a DAG)
+   
    public SAP(Digraph G)
    {
        mGraph = new Digraph(G);
-       //cache = new Node[G.V()][G.V()];
-       //cache = new int[G.V()][G.V()];
-       //Arrays.fill(cache, -1);
    }
 
    // length of shortest ancestral path between v and w; -1 if no such path
    public int length(int v, int w)
    {
-//       if (v == w) 
-//           return 0;
-////       if (cache[v][w] > 0)
-////           return cache[v][w].getLength();
-//       int[] reach = new int[mGraph.V()];
-//       return BFS(v, w, reach, mGraph.E());
-//       BreadthFirstDirectedPaths t = new BreadthFirstDirectedPaths(G,v);
-//       int l = -1;
-//       if (t.hasPathTo(w))
-//       {
-//           //Node tN = new Node(
-//           l = t.distTo(w); 
-//       }
-//       cache[v][w] = l;
-//       cache[w][v] = l;
-//       return l;
        Node t = BFS(v,w);
        return t.getLength();
    }
    private Node BFS(Iterable<Integer> v, Iterable<Integer> w)
    {
-       Queue<Integer> q = new Queue<Integer>();
-       boolean[] marked = new boolean[mGraph.V()];
-       //boolean[] group = new boolean[mGraph.V()];
-       int[] distTo = new int[mGraph.V()];
+       Queue<Integer> queue = new Queue<Integer>();
+       
+       int[] distToV = new int[mGraph.V()];
         for (int v1 = 0; v1 < mGraph.V(); v1++)
-            distTo[v1] = INFINITY;
-       //int[] edgeTo = new int[mGraph.V()];
-       int bestSoFar = mGraph.E();
+            distToV[v1] = -1;
+       
         for (int s : v) {
-            marked[s] = true;
-            //group[s] = true;
-            distTo[s] = 0;
-            q.enqueue(s);
+            
+            distToV[s] = 0;
+            queue.enqueue(s);
         }
+        BFSLoop(distToV, queue);
         
-        
-       int ancestor = -1;
-       //int distance = -1;
-       while (!q.isEmpty())
-       {
-            int curr = q.dequeue();
-//            if (distTo[curr] > bestSoFar)
-//               break;
-            for (Integer m : mGraph.adj(curr))
-           {
-               if (!marked[m]) {
-                    //edgeTo[m] = curr;
-                    distTo[m] = distTo[curr] + 1;
-                    marked[m] = true;
-                    //group[m] = group[curr]; 
-                   q.enqueue(m);
-               }
-   
-           }
-//           if (ancestor >= 0)
-//               break;
-       }
        int[] distToW = new int[mGraph.V()];
+       for (int v1 = 0; v1 < mGraph.V(); v1++)
+            distToW[v1] = -1;
        for (int s2 : w) {
-            //marked[s2] = true;
             distToW[s2] = 0;
-            q.enqueue(s2);
+            queue.enqueue(s2);
         }
-       while (!q.isEmpty())
+       return BFSFinder(distToV, distToW, queue);
+   }
+   
+   private void BFSLoop(int[] distTo, Queue<Integer> queue)
+   {
+       while (!queue.isEmpty())
        {
-           int curr = q.dequeue();
-           if (distToW[curr] > bestSoFar)
-               break;
-               
-           if(marked[curr])
+           int curr = queue.dequeue();
+           for (Integer m : mGraph.adj(curr))
            {
-               if (bestSoFar > distTo[curr] + distToW[curr])
+               if (distTo[m] == -1) {
+                   distTo[m] = distTo[curr] + 1;
+                   queue.enqueue(m);
+               }
+           }
+       }
+   }
+   private Node BFSFinder(int[] distToV, int[] distToW, Queue<Integer> queue)
+   {
+       int bestSoFar = INFINITY;
+       int ancestor = -1;
+       while (!queue.isEmpty())
+       {
+           int curr = queue.dequeue();
+           if(distToV[curr] > -1)
+           {
+               if (bestSoFar > distToV[curr] + distToW[curr])
                {
-                   bestSoFar = distTo[curr] + distToW[curr];
+                   bestSoFar = distToV[curr] + distToW[curr];
                    ancestor = curr;
                }
            }
-           
-           for (Integer m :  mGraph.adj(curr))
+           for (Integer m : mGraph.adj(curr))
            {
-               q.enqueue(m);
-               distToW[m] = distToW[curr] + 1;
+               if (distToW[m] == -1)
+               {
+                     queue.enqueue(m);
+                     distToW[m] = distToW[curr] + 1;
+               }
            }
        }
        if (ancestor == -1)
            bestSoFar = -1;
+       
        return new Node(ancestor, bestSoFar);
    }
    
    private Node BFS(int v, int w)
    {
-       //int[] reach = new int[mGraph.V()];
-//       if (cache[v][w] != null)
-//           return cache[v][w].getLength();
        if (v == w)
            return new Node(v, 0);
        Queue<Integer> queue = new Queue<Integer>();
-       boolean[] marked = new boolean[mGraph.V()];
-       //boolean[] group = new boolean[mGraph.V()];
-       int[] distTo = new int[mGraph.V()];
-       //int[] edgeTo = new int[mGraph.V()];
+       int[] distToV = new int[mGraph.V()];
         for (int v1 = 0; v1 < mGraph.V(); v1++)
-            distTo[v1] = INFINITY;
-       int bestSoFar = mGraph.E();
-       //int left = 0;
-       //int l = 0;
+            distToV[v1] = -1;
        queue.enqueue(v);
+       distToV[v] = 0;
+       BFSLoop(distToV, queue);
        
-       marked[v] = true;
-       //group[v] = true;
-       distTo[v] = 0;
        
-       distTo[w] = 0;
-       //int bestSoFar = mGraph.E();
-       int ancestor = -1;
-       //int distance = -1;
-       while (!queue.isEmpty())
-       {
-//           if (left == 0)
-//           {
-//               left += queue.size();
-//               l++;
-//           }
-           //StdOut.println(Arrays.toString(reach));
-           int curr = queue.dequeue();
-           
-           //left--;
-//           if(curr == w)
-//           {
-//               bestSoFar = l;
-//               ancestor = w;
-//           }
-//           if(curr != v && (reach[curr] == 0 || reach[curr] > l - 1))
-//           {
-//               reach[curr] = l - 1;
-//           }
-           for (Integer m : mGraph.adj(curr))
-           {
-               if (!marked[m]) {
-                    //edgeTo[m] = curr;
-                    distTo[m] = distTo[curr] + 1;
-                    //group[m] = group[curr]; 
-                    marked[m] = true;
-                   queue.enqueue(m);
-               }
-           }
-       }
-       
-       //check if w is visited or not
-//       if (marked[w])
-//       {
-//           bestSoFar = distTo[w];
-//           ancestor = w;
-//       }  
-       queue.enqueue(w);
-       //marked[w] = true;
-       int[] distToW = new int[mGraph.V()];
-       distToW[w] = 0;
-       while (!queue.isEmpty())
-       {
-           int curr = queue.dequeue();
-           if (distToW[curr] > bestSoFar)
-               break;
-               
-           if(marked[curr])
-           {
-               if (bestSoFar > distTo[curr] + distToW[curr])
-               {
-                   bestSoFar = distTo[curr] + distToW[curr];
-                   ancestor = curr;
-               }
-           }
-           
-           for (Integer m :  mGraph.adj(curr))
-           {
-               queue.enqueue(m);
-               distToW[m] = distToW[curr] + 1;
-           }
-       }
-       if (ancestor == -1)
-           bestSoFar = -1;
-       return new Node(ancestor, bestSoFar);
-//       else
-//               {
-//                   
-//                   if (group[m] != group[curr])
-//                   {
-//                      int temp = distTo[m] + distTo[curr] + 1;
-//                      if(bestSoFar > temp)
-//                      {
-//                          ancestor = m;
-//                          bestSoFar = temp;
-//                          distance = temp;
-//                      } 
-//                   }
-//                   else
-//                   {
-//                       if(distTo[m] < )
-//                   }
-//               }
-//       queue.enqueue(w);
-//       left = 0;
-//       l = 0;
+      
 //       while (!queue.isEmpty())
 //       {
-//           if (left == 0)
-//           {
-//               left += queue.size();
-//               l++;
-//           }
-//           if (l > bestSoFar)
-//           {
-//               break;
-//           }
+////           if (left == 0)
+////           {
+////               left += queue.size();
+////               l++;
+////           }
+//           //StdOut.println(Arrays.toString(reach));
 //           int curr = queue.dequeue();
-//           left--;
-//           if (curr == v || reach[curr] > 0)
-//           {
-//                   //StdOut.println(curr + " : " + reach[curr]);
-//                   if (bestSoFar > reach[curr] + l - 1)
-//                   {
-//                       bestSoFar = reach[curr] + l - 1;
-//                       ancestor = curr;
-//                   }
-//           }
-//           if(curr != w && reach[curr] == 0)
-//           {
-//               reach[curr] = l - 1;
-//           }
+//           
+//           //left--;
+////           if(curr == w)
+////           {
+////               bestSoFar = l;
+////               ancestor = w;
+////           }
+////           if(curr != v && (reach[curr] == 0 || reach[curr] > l - 1))
+////           {
+////               reach[curr] = l - 1;
+////           }
 //           for (Integer m : mGraph.adj(curr))
 //           {
-//               queue.enqueue(m);
+//               if (distTo[m] == -1) {
+//                    //edgeTo[m] = curr;
+//                    distTo[m] = distTo[curr] + 1;
+//                    //group[m] = group[curr]; 
+//                    //marked[m] = true;
+//                   queue.enqueue(m);
+//               }
 //           }
 //       }
-//       
-//       if(bestSoFar < mGraph.E())
-//       {
-//           cache[v][w] = new Node(ancestor, bestSoFar);
-//           cache[w][v] = new Node(ancestor, bestSoFar);
-//           return bestSoFar;
-//       }
-//       return -1;
+       
+ 
+       queue.enqueue(w);
+       int[] distToW = new int[mGraph.V()];
+       for (int v1 = 0; v1 < mGraph.V(); v1++)
+            distToW[v1] = -1;
+       distToW[w] = 0;
+       return BFSFinder(distToV, distToW, queue);
    }
    
 
@@ -296,74 +172,14 @@ public class SAP {
    // in a shortest ancestral path; -1 if no such path
    public int ancestor(int v, int w)
    {
-//       if (cache[v][w] != null)
-//           return cache[v][w].getNode();
-//       int k = length(v,w);
-//       if (cache[v][w] != null)
-//           return cache[v][w].getNode();
-//       return -1;
        Node t = BFS(v,w);
        return t.getNode();
    }
-//   private int bfs(Digraph G, Iterable<Integer> sources, 
-//                    int[] marked, int[] distTo, int[] edgeTo, boolean first) {
-//       int l = -1; 
-//       int ancestor = -1;
-//        Queue<Integer> q = new Queue<Integer>();
-//        for (int s : sources) {
-//            if(!marked[s])
-//            {
-//                marked[s] = true;
-//                distTo[s] = 0;
-//                q.enqueue(s);
-//            }
-//            else
-//            {
-//                l = 0;
-//                ancestor = s;
-//            }
-//        }
-//        if(l > -1 && ancestor > -1)
-//        {
-//            return
-//        }
-//        while (!q.isEmpty()) {
-//            int v = q.dequeue();
-//            for (int w : G.adj(v)) {
-//                if (!marked[w]) {
-//                    edgeTo[w] = v;
-//                    distTo[w] = distTo[v] + 1;
-//                    marked[w] = true;
-//                    q.enqueue(w);
-//                }
-//            }
-//        }
-//    }
+
    // length of shortest ancestral path between any vertex 
    // in v and any vertex in w; -1 if no such path
    public int length(Iterable<Integer> v, Iterable<Integer> w)
    {
-       //if (recent)
-//       int bestSoFar = mGraph.E();
-//       //int bestAncestor = -1;
-//       int[] reach = new int[mGraph.V()];
-//       for (int mV : v)
-//       {
-//           for (int mW : w)
-//           {
-//               Arrays.fill(reach, 0);
-//               int temp = BFS(mV,mW,reach,bestSoFar);
-//               if (temp > 0 && temp < bestSoFar)
-//               {
-//                   bestSoFar = temp;
-//                   //bestAncestor = ancestor(mV,mW);
-//               }
-//           }
-//       }
-//       if (bestSoFar == mGraph.E())
-//           return -1;
-//       return bestSoFar;
-       //return -1;
        Node t = BFS(v,w);
        return t.getLength();
    }
@@ -372,24 +188,6 @@ public class SAP {
    // ancestral path; -1 if no such path
    public int ancestor(Iterable<Integer> v, Iterable<Integer> w)
    {
-//       int bestSoFar = mGraph.E();
-//       int bestAncestor = -1;
-//       int[] reach = new int[mGraph.V()];
-//       for (int mV : v)
-//       {
-//           for (int mW : w)
-//           {
-//               Arrays.fill(reach, 0);
-//               int temp = BFS(mV,mW,reach,bestSoFar);
-//               if (temp > 0 && temp < bestSoFar)
-//               {
-//                   bestSoFar = temp;
-//                   bestAncestor = ancestor(mV,mW);
-//               }
-//           }
-//       }
-//       return bestAncestor;
-       //return -1;
        Node t = BFS(v,w);
        return t.getNode();
    }
@@ -405,11 +203,11 @@ public class SAP {
         t = true;
     }
     Digraph G = new Digraph(in);
-       //StdOut.println("Graph : \n" + G);
+       
     SAP sap = new SAP(G);
     if (t)
     {
-        //StdOut.println("Chuoi : ");
+        
         while (!StdIn.isEmpty()) {
             String v1 = StdIn.readLine();
             String[] s1 = v1.split(" ");
