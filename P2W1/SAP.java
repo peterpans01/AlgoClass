@@ -10,7 +10,12 @@ import edu.princeton.cs.algs4.StdOut;
 public class SAP {
    private Digraph mGraph;
    private static final int INFINITY = Integer.MAX_VALUE;
-   
+   private int[] distToW;
+   private int[] distToV;
+   private int[] reachFromW;
+   private int[] reachFromV;
+   private int index;
+   private Queue<Integer> queue;
    private class Node
    {
        private int n;
@@ -35,6 +40,12 @@ public class SAP {
    public SAP(Digraph G)
    {
        mGraph = new Digraph(G);
+       distToW = new int[mGraph.V()];
+       distToV = new int[mGraph.V()];
+       reachFromV = new int[mGraph.V()];
+       reachFromW = new int[mGraph.V()];
+       queue = new Queue<Integer>();
+       index = 0;
    }
 
    // length of shortest ancestral path between v and w; -1 if no such path
@@ -45,51 +56,64 @@ public class SAP {
    }
    private Node BFS(Iterable<Integer> v, Iterable<Integer> w)
    {
-       Queue<Integer> queue = new Queue<Integer>();
        
-       int[] distToV = new int[mGraph.V()];
-        for (int v1 = 0; v1 < mGraph.V(); v1++)
-            distToV[v1] = -1;
        
-        for (int s : v) {
+       //distToV = new int[mGraph.V()];
+       //for (int v1 = 0; v1 < mGraph.V(); v1++)
+            //distToV[v1] = -1;
+       if(index == INFINITY)
+       {
+           for (int v1 = 0; v1 < mGraph.V(); v1++)
+           {
+               reachFromV[v1] = 0;
+               reachFromW[v1] = 0;
+           }
+           index = 0;
+       }
+       index++;
+       for (int s : v) {
             
             distToV[s] = 0;
+            reachFromV[s] = index;
             queue.enqueue(s);
         }
-        BFSLoop(distToV, queue);
+        BFSLoop();
         
-       int[] distToW = new int[mGraph.V()];
-       for (int v1 = 0; v1 < mGraph.V(); v1++)
-            distToW[v1] = -1;
+       
+       //for (int v1 = 0; v1 < mGraph.V(); v1++)
+       //     distToW[v1] = -1;
        for (int s2 : w) {
+            reachFromW[s2] = index;
             distToW[s2] = 0;
             queue.enqueue(s2);
         }
-       return BFSFinder(distToV, distToW, queue);
+       return BFSFinder();
    }
    
-   private void BFSLoop(int[] distTo, Queue<Integer> queue)
+   private void BFSLoop()
    {
+       
        while (!queue.isEmpty())
        {
            int curr = queue.dequeue();
            for (Integer m : mGraph.adj(curr))
            {
-               if (distTo[m] == -1) {
-                   distTo[m] = distTo[curr] + 1;
+               if (reachFromV[m] < index) {
+                   reachFromV[m] = index;
+                   distToV[m] = distToV[curr] + 1;
                    queue.enqueue(m);
                }
            }
        }
    }
-   private Node BFSFinder(int[] distToV, int[] distToW, Queue<Integer> queue)
+   private Node BFSFinder()
    {
        int bestSoFar = INFINITY;
        int ancestor = -1;
        while (!queue.isEmpty())
        {
            int curr = queue.dequeue();
-           if(distToV[curr] > -1)
+           if(reachFromV[curr] == index)
            {
                if (bestSoFar > distToV[curr] + distToW[curr])
                {
@@ -99,16 +123,20 @@ public class SAP {
            }
            for (Integer m : mGraph.adj(curr))
            {
-               if (distToW[m] == -1)
+               if (reachFromW[m] < index)
                {
                      queue.enqueue(m);
+                     reachFromW[m] = index;
                      distToW[m] = distToW[curr] + 1;
                }
            }
        }
        if (ancestor == -1)
            bestSoFar = -1;
-       
+       while (!queue.isEmpty())
+       {
+           queue.dequeue();
+       }
        return new Node(ancestor, bestSoFar);
    }
    
@@ -116,13 +144,24 @@ public class SAP {
    {
        if (v == w)
            return new Node(v, 0);
-       Queue<Integer> queue = new Queue<Integer>();
-       int[] distToV = new int[mGraph.V()];
-        for (int v1 = 0; v1 < mGraph.V(); v1++)
-            distToV[v1] = -1;
+//       Queue<Integer> queue = new Queue<Integer>();
+//       int[] distToV = new int[mGraph.V()];
+//        for (int v1 = 0; v1 < mGraph.V(); v1++)
+//            distToV[v1] = -1;
+       if(index == INFINITY)
+       {
+           for (int v1 = 0; v1 < mGraph.V(); v1++)
+           {
+               reachFromV[v1] = 0;
+               reachFromW[v1] = 0;
+           }
+           index = 0;
+       }
+       index++;
        queue.enqueue(v);
+       reachFromV[v] = index;
        distToV[v] = 0;
-       BFSLoop(distToV, queue);
+       BFSLoop();
        
        
       
@@ -160,11 +199,11 @@ public class SAP {
        
  
        queue.enqueue(w);
-       int[] distToW = new int[mGraph.V()];
-       for (int v1 = 0; v1 < mGraph.V(); v1++)
-            distToW[v1] = -1;
+       //int[] distToW = new int[mGraph.V()];
+       //for (int v1 = 0; v1 < mGraph.V(); v1++)
+       //     distToW[v1] = -1;
        distToW[w] = 0;
-       return BFSFinder(distToV, distToW, queue);
+       return BFSFinder();
    }
    
 
